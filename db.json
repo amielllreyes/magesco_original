@@ -1,0 +1,47 @@
+{
+    "products": [
+      {
+        "id": 1,
+        "title": "Vacuum Hose",
+        "image": "/vacuumhose.png",
+        "price": "29.99",
+        "description": "High-quality chlorine tablets for pool maintenance."
+      },
+      {
+        "id": 2,
+        "title": "Vacuum Head",
+        "image": "/vacuumhead.png",
+        "price": "199.99",
+        "description": "Automatic pool vacuum for easy cleaning."
+      },
+      {
+        "id": 3,
+        "title": "Nylon Brush",
+        "image": "/nylonbrush.png",
+        "price": "89.99",
+        "description": "Durable pool cover to keep your pool clean."
+      },
+      {
+        "id": 4,
+        "title": "Leaf Scoop",
+        "image": "/leafscoop.png",
+        "price": "89.99",
+        "description": "Durable pool cover to keep your pool clean."
+      },
+      {
+        "id": 5,
+        "title": "Telescopic Handle",
+        "image": "/telescopichandle.png",
+        "price": "89.99",
+        "description": "Durable pool cover to keep your pool clean."
+      },
+      {
+        "id": 6,
+        "title": "Water pH Test Kit",
+        "image": "/testkit.png",
+        "price": "89.99",
+        "description": "Durable pool cover to keep your pool clean."
+      }
+      
+    ]
+  }

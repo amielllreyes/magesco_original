@@ -1,0 +1,58 @@
+<svg id="visual" viewBox="0 0 960 540" width="960" height="540" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+  <rect x="0" y="0" width="960" height="540" fill="#CAF0F8"></rect>
+
+  <!-- Layer 1 -->
+  <path fill="#2d8dc4">
+    <animate attributeName="d" dur="5s" repeatCount="indefinite"
+      values="
+        M0 345 Q240 400 480 345 T960 345 L960 540 L0 540 Z;
+        M0 360 Q240 320 480 360 T960 360 L960 540 L0 540 Z;
+        M0 345 Q240 400 480 345 T960 345 L960 540 L0 540 Z
+      "
+    />
+  </path>
+
+  <!-- Layer 2 -->
+  <path fill="#2a9dce">
+    <animate attributeName="d" dur="6s" repeatCount="indefinite"
+      values="
+        M0 462 Q240 480 480 462 T960 462 L960 540 L0 540 Z;
+        M0 475 Q240 450 480 475 T960 475 L960 540 L0 540 Z;
+        M0 462 Q240 480 480 462 T960 462 L960 540 L0 540 Z
+      "
+    />
+  </path>
+
+  <!-- Layer 3 -->
+  <path fill="#2eacd6">
+    <animate attributeName="d" dur="7s" repeatCount="indefinite"
+      values="
+        M0 487 Q240 520 480 487 T960 487 L960 540 L0 540 Z;
+        M0 505 Q240 460 480 505 T960 505 L960 540 L0 540 Z;
+        M0 487 Q240 520 480 487 T960 487 L960 540 L0 540 Z
+      "
+    />
+  </path>
+
+  <!-- Layer 4 -->
+  <path fill="#39bbdd">
+    <animate attributeName="d" dur="8s" repeatCount="indefinite"
+      values="
+        M0 480 Q240 500 480 480 T960 480 L960 540 L0 540 Z;
+        M0 490 Q240 470 480 490 T960 490 L960 540 L0 540 Z;
+        M0 480 Q240 500 480 480 T960 480 L960 540 L0 540 Z
+      "
+    />
+  </path>
+
+  <!-- Layer 5 -->
+  <path fill="#48cae4">
+    <animate attributeName="d" dur="9s" repeatCount="indefinite"
+      values="
+        M0 507 Q240 525 480 507 T960 507 L960 540 L0 540 Z;
+        M0 515 Q240 500 480 515 T960 515 L960 540 L0 540 Z;
+        M0 507 Q240 525 480 507 T960 507 L960 540 L0 540 Z
+      "
+    />
+  </path>
+</svg>
