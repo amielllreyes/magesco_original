@@ -3,6 +3,7 @@
 import { Poppins } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="!scroll-smooth">
       <body className={`${poppins.variable} antialiased`}>
+ 
         <CartProvider>
           <header className="border-b border-lightblue p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -159,6 +161,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </footer>
         </CartProvider>
+ 
       </body>
     </html>
   );

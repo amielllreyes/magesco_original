@@ -50,8 +50,7 @@ export default function AboutUs() {
           ABOUT US
         </h1>
         <p className="text-lg sm:text-xl text-white max-w-2xl mx-auto">
-          Transforming outdoor spaces into breathtaking retreats since 2010
-        </p>
+        Welcome to Magesco Garden and Pool Services! An all-inclusive service store that delivers both exceptional swimming pool and landscaping service needs and affordable swimming pool and landscaping products, without sacrificing the quality and durability on both products and services.        </p>
       </motion.div>
 
 
@@ -76,8 +75,11 @@ export default function AboutUs() {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Our Mission</h2>
           </div>
           <p className="text-gray-700 pl-0 sm:pl-14">
-            Our mission is to provide top-notch landscaping and pool repair services that enhance the beauty and functionality of your outdoor spaces.
-          </p>
+          MAGESCO Garden and Pool Services is dedicated in providing quality services and products to its clients together with a good and lasting after service that builds relationship and partnership.
+
+It is our mission to competently maintain high quality and affordable construction services, maintenance services and products align with swimming pool and landscape needs. Together with this is a mission for a long and lasting client relationship in terms of after service and technical support.
+
+Our challenge is to continually develop these high standards in customer services and products as well as promoting personal employee growth.          </p>
         </motion.div>
 
         <motion.div 
@@ -94,34 +96,10 @@ export default function AboutUs() {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Our Vision</h2>
           </div>
           <p className="text-gray-700 pl-0 sm:pl-14">
-            We envision a world where every home has a beautiful and functional outdoor space that reflects the owner's personality and lifestyle.
-          </p>
-        </motion.div>
-      </motion.div>
+          MAGESCO Garden and Pool Services envisioned itself to be the best Land Developer in terms of Swimming Pool construction, Landscape development and Home Improvement in the Philippines.
 
-    
-      <motion.div 
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-        className="flex flex-col sm:flex-row justify-around my-12 sm:my-16 w-full max-w-4xl gap-6 sm:gap-0"
-      >
-        {[
-          { value: "10", label: "Years Experience" },
-          { value: "500+", label: "Happy Clients" },
-          { value: "100%", label: "Satisfaction" }
-        ].map((stat, index) => (
-          <motion.div 
-            key={index}
-            variants={item}
-            whileHover={{ scale: 1.05 }}
-            className="text-center bg-white/20 backdrop-blur-sm p-4 rounded-xl"
-          >
-            <div className="text-3xl sm:text-5xl font-bold text-white mb-1 sm:mb-2">{stat.value}</div>
-            <div className="text-sm sm:text-base text-gray-200">{stat.label}</div>
-          </motion.div>
-        ))}
+MAGESCO Garden and Pool Services also wants to become the best in terms of quality maintenance services, both in providing its clients manpower for services and in-house maintenance for their home and business as well.          </p>
+        </motion.div>
       </motion.div>
 
   

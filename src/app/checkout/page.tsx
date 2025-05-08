@@ -5,13 +5,13 @@ import { useEffect, useState } from "react";
 import { auth, db } from "@/config/firebaseConfig";
 import { doc, getDoc, collection, setDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 export default function Checkout() {
-  const { cart, clearCart } = useCart(); 
+  const { cart, clearCart } = useCart();
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -33,8 +33,7 @@ export default function Checkout() {
         if (docSnap.exists()) {
           const userData = docSnap.data();
           setUserData(userData);
-          
-          // Split full name into first and last name
+
           const nameParts = userData.name?.split(' ') || [];
           const firstName = nameParts[0] || '';
           const lastName = nameParts.slice(1).join(' ') || '';
@@ -64,18 +63,40 @@ export default function Checkout() {
     }));
   };
 
-  const handleProceedToPayment = async () => {
-    // Validate required fields
-    if (!formData.firstName || !formData.lastName || !formData.address || 
-        !formData.city || !formData.zip || !formData.phone) {
-      alert("Please fill in all required shipping information");
-      return;
+  const createOrder = (data: any, actions: any) => {
+    if (!formData.firstName || !formData.lastName || !formData.address ||
+      !formData.city || !formData.zip || !formData.phone) {
+      throw new Error("Please fill in all required shipping information");
     }
 
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: subtotal.toFixed(2),
+          currency_code: "PHP"
+        },
+        description: `Order from ${formData.firstName} ${formData.lastName}`,
+        shipping: {
+          name: {
+            full_name: `${formData.firstName} ${formData.lastName}`
+          },
+          address: {
+            address_line_1: formData.address,
+            admin_area_2: formData.city,
+            postal_code: formData.zip,
+            country_code: "PH"
+          }
+        }
+      }]
+    });
+  };
+
+  const onApprove = async (data: any, actions: any) => {
     try {
-      if (!auth.currentUser) throw new Error("User not logged in");
+      const details = await actions.order.capture();
       
-      // Create order document
+      if (!auth.currentUser) throw new Error("User not logged in");
+
       const orderRef = doc(collection(db, "orders"));
       await setDoc(orderRef, {
         userId: auth.currentUser.uid,
@@ -83,16 +104,22 @@ export default function Checkout() {
         total: subtotal,
         shippingInfo: formData,
         status: "Processing",
-        paymentMethod: "Credit Card", // Update with actual payment method
+        paymentMethod: "PayPal",
+        paypalTransactionId: details.id,
         createdAt: new Date()
       });
 
       clearCart();
       router.push("/payment-success");
     } catch (error) {
-      console.error("Error creating order:", error);
-      alert("There was an error processing your order");
+      console.error("Payment processing error:", error);
+      alert("❌ Payment processing failed. Please try again.");
     }
+  };
+
+  const onError = (err: any) => {
+    console.error("PayPal error:", err);
+    alert("❌ Payment failed. Please try again or use another payment method.");
   };
 
   if (loading) {
@@ -116,11 +143,11 @@ export default function Checkout() {
             <div className="flex space-x-4">
               <label className="flex flex-col w-1/2">
                 <span className="text-sm font-medium text-gray-700">First Name *</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="firstName"
-                  placeholder="First Name" 
-                  className="p-2 border border-gray-300 rounded-md" 
+                  placeholder="First Name"
+                  className="p-2 border border-gray-300 rounded-md"
                   value={formData.firstName}
                   onChange={handleInputChange}
                   required
@@ -128,11 +155,11 @@ export default function Checkout() {
               </label>
               <label className="flex flex-col w-1/2">
                 <span className="text-sm font-medium text-gray-700">Last Name *</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="lastName"
-                  placeholder="Last Name" 
-                  className="p-2 border border-gray-300 rounded-md" 
+                  placeholder="Last Name"
+                  className="p-2 border border-gray-300 rounded-md"
                   value={formData.lastName}
                   onChange={handleInputChange}
                   required
@@ -141,11 +168,11 @@ export default function Checkout() {
             </div>
             <label className="flex flex-col">
               <span className="text-sm font-medium text-gray-700">Address *</span>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="address"
-                placeholder="Address" 
-                className="p-2 border border-gray-300 rounded-md" 
+                placeholder="Address"
+                className="p-2 border border-gray-300 rounded-md"
                 value={formData.address}
                 onChange={handleInputChange}
                 required
@@ -154,11 +181,11 @@ export default function Checkout() {
             <div className="flex space-x-4">
               <label className="flex flex-col w-1/2">
                 <span className="text-sm font-medium text-gray-700">City *</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="city"
-                  placeholder="City" 
-                  className="p-2 border border-gray-300 rounded-md" 
+                  placeholder="City"
+                  className="p-2 border border-gray-300 rounded-md"
                   value={formData.city}
                   onChange={handleInputChange}
                   required
@@ -166,11 +193,11 @@ export default function Checkout() {
               </label>
               <label className="flex flex-col w-1/4">
                 <span className="text-sm font-medium text-gray-700">Zip Code *</span>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="zip"
-                  placeholder="Zip" 
-                  className="p-2 border border-gray-300 rounded-md" 
+                  placeholder="Zip"
+                  className="p-2 border border-gray-300 rounded-md"
                   value={formData.zip}
                   onChange={handleInputChange}
                   required
@@ -179,11 +206,11 @@ export default function Checkout() {
             </div>
             <label className="flex flex-col">
               <span className="text-sm font-medium text-gray-700">Phone Number *</span>
-              <input 
-                type="tel" 
+              <input
+                type="tel"
                 name="phone"
-                placeholder="Phone Number" 
-                className="p-2 border border-gray-300 rounded-md" 
+                placeholder="Phone Number"
+                className="p-2 border border-gray-300 rounded-md"
                 value={formData.phone}
                 onChange={handleInputChange}
                 required
@@ -239,15 +266,29 @@ export default function Checkout() {
             </div>
           </div>
 
-          <button
-            onClick={handleProceedToPayment}
-            disabled={cart.length === 0}
-            className={`mt-6 w-full text-white font-medium px-6 py-3 rounded-lg transition ${
-              cart.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-            }`}
-          >
-            Proceed to Payment
-          </button>
+          <div className="mt-6 w-full">
+            {cart.length > 0 && (
+              <PayPalScriptProvider 
+                options={{ 
+                  clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "sb", 
+                  currency: "PHP",
+                  intent: "capture"
+                }}
+              >
+                <PayPalButtons 
+                  style={{ 
+                    layout: "vertical",
+                    color: "blue",
+                    shape: "rect",
+                    label: "paypal"
+                  }}
+                  createOrder={createOrder}
+                  onApprove={onApprove}
+                  onError={onError}
+                />
+              </PayPalScriptProvider>
+            )}
+          </div>
         </div>
       </div>
     </main>

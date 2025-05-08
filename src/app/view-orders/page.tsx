@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, query, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, query, doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "@/config/firebaseConfig";
-import { FiArrowLeft, FiShoppingBag, FiClock, FiUser, FiDollarSign, FiMapPin, FiShield } from "react-icons/fi";
+import { FiArrowLeft, FiShoppingBag, FiClock, FiUser, FiDollarSign, FiMapPin, FiShield, FiEdit, FiCheck, FiX } from "react-icons/fi";
 
 const AdminOrdersPage = () => {
   const [user, setUser] = useState<any>(null);
@@ -13,6 +13,8 @@ const AdminOrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const [newStatus, setNewStatus] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -23,7 +25,6 @@ const AdminOrdersPage = () => {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (userDoc.exists() && userDoc.data().role === "admin") {
           setIsAdmin(true);
-          // Fetch all orders
           fetchOrders();
         } else {
           router.push("/");
@@ -51,13 +52,39 @@ const AdminOrdersPage = () => {
         });
       });
 
-      // Sort orders by date (newest first)
       allOrders.sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
       setOrders(allOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
       setOrdersLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId: string) => {
+    try {
+      await updateDoc(doc(db, "orders", orderId), {
+        status: newStatus
+      });
+      setEditingOrderId(null);
+      fetchOrders(); // Refresh the orders list
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Processing":
+        return "bg-blue-100 text-blue-800";
+      case "Shipped":
+        return "bg-yellow-100 text-yellow-800";
+      case "Delivered":
+        return "bg-green-100 text-green-800";
+      case "Cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -100,7 +127,6 @@ const AdminOrdersPage = () => {
     <div className="min-h-screen bg-lightblue bg-[url('/layeredwaves.svg')] bg-no-repeat bg-bottom bg-cover p-4">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          {/* Header */}
           <div className="bg-blue-600 text-white p-6 flex items-center justify-between">
             <button 
               onClick={() => router.push("/admin")}
@@ -113,10 +139,9 @@ const AdminOrdersPage = () => {
               <FiShoppingBag className="w-6 h-6" />
               All Orders
             </h1>
-            <div className="w-10"></div> {/* Spacer for alignment */}
+            <div className="w-10"></div>
           </div>
 
-          {/* Orders List */}
           <div className="p-6">
             {ordersLoading ? (
               <div className="flex justify-center py-12">
@@ -130,7 +155,6 @@ const AdminOrdersPage = () => {
               <div className="space-y-6">
                 {orders.map((order) => (
                   <div key={order.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                    {/* Order Header */}
                     <div className="bg-gray-50 p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
                         <p className="font-medium">Order #{order.id.substring(0, 8)}</p>
@@ -140,9 +164,50 @@ const AdminOrdersPage = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                          {order.status || "Processing"}
-                        </span>
+                        {editingOrderId === order.id ? (
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={newStatus}
+                              onChange={(e) => setNewStatus(e.target.value)}
+                              className="border rounded p-1 text-sm"
+                            >
+                              <option value="Processing">Processing</option>
+                              <option value="Shipped">Shipped</option>
+                              <option value="Delivered">Delivered</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <button
+                              onClick={() => updateOrderStatus(order.id)}
+                              className="text-green-500 hover:text-green-700"
+                              title="Save"
+                            >
+                              <FiCheck className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setEditingOrderId(null)}
+                              className="text-red-500 hover:text-red-700"
+                              title="Cancel"
+                            >
+                              <FiX className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                              {order.status || "Processing"}
+                            </span>
+                            <button
+                              onClick={() => {
+                                setEditingOrderId(order.id);
+                                setNewStatus(order.status || "Processing");
+                              }}
+                              className="text-gray-500 hover:text-blue-500"
+                              title="Edit status"
+                            >
+                              <FiEdit className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
                         <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center gap-1">
                           <FiUser className="w-3 h-3" />
                           {order.userId.substring(0, 6)}...
@@ -150,7 +215,6 @@ const AdminOrdersPage = () => {
                       </div>
                     </div>
                     
-                    {/* Shipping Info */}
                     <div className="p-4 bg-white border-b border-gray-100">
                       <h3 className="font-medium mb-2 flex items-center gap-2">
                         <FiMapPin className="text-blue-500" />
@@ -164,7 +228,6 @@ const AdminOrdersPage = () => {
                       </div>
                     </div>
                     
-                    {/* Order Items */}
                     <div className="bg-gray-50 p-4">
                       <h3 className="font-medium mb-3">Items</h3>
                       {order.items.map((item: any) => (
@@ -185,12 +248,16 @@ const AdminOrdersPage = () => {
                       ))}
                     </div>
                     
-                    {/* Order Summary */}
                     <div className="bg-white p-4 border-t border-gray-200">
                       <div className="flex justify-between items-center">
                         <div>
                           <p className="text-sm text-gray-600">Payment Method:</p>
                           <p className="font-medium">{order.paymentMethod || "Credit Card"}</p>
+                          {order.paypalTransactionId && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Transaction ID: {order.paypalTransactionId}
+                            </p>
+                          )}
                         </div>
                         <div className="text-right">
                           <p className="text-sm text-gray-600">Total Amount</p>
